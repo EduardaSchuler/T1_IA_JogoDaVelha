@@ -1,5 +1,34 @@
 # T1 - Tic Tac Toe com ML
 #### Grupo E: João Henrique Pires Bergallo, João Vitor Lichston Machado, Larissa Oliveira da Silva e Maria Eduarda da Silveira Schüler
+
+## Como rodar
+
+### 1) Dependências
+
+Com o ambiente virtual ativo (ex.: `.venv`), instale as dependências do trabalho:
+
+`python3 -m pip install -r T1_IA_JogoDaVelha/requirements.txt`
+
+### 2) Treinar e gerar artefatos (modelos/gráficos)
+
+O treino gera os CSVs em `T1_IA_JogoDaVelha/dataset/` e salva o modelo + gráficos em `T1_IA_JogoDaVelha/outputs/`.
+
+`python3 T1_IA_JogoDaVelha/decision_tree_final.py`
+
+### 3) Subir o frontend (Flask)
+
+`python3 T1_IA_JogoDaVelha/frontend.py`
+
+Acesse: `http://localhost:5000`
+
+### Rodar tudo junto (treina se faltar o modelo e inicia o servidor)
+
+`python3 T1_IA_JogoDaVelha/run_all.py`
+
+Para forçar re-treino:
+
+`python3 T1_IA_JogoDaVelha/run_all.py --train`
+
 ### Enunciado
 Neste primeiro trabalho prático da disciplina, você vai construir um sistema de IA para o jogo
 da velha em um tabuleiro clássico 3x3. O objetivo da IA não é ser um dos players, mas sim
