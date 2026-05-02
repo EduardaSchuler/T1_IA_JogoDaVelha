@@ -1,0 +1,35 @@
+{
+  "algoritmo": "Decision Tree",
+  "params": {
+    "criterion": "entropy",
+    "max_depth": "7",
+    "min_samples_split": "2",
+    "min_samples_leaf": "2"
+  },
+  "acuracia_teste": 0.9146,
+  "precision_weighted": 0.9152,
+  "recall_weighted": 0.9146,
+  "f1_weighted": 0.9135,
+  "cv_mean": 0.908,
+  "cv_std": 0.0133,
+  "profundidade_real": 7,
+  "n_folhas": 38,
+  "feature_importances": {
+    "tl": 0.002,
+    "tm": 0.0,
+    "tr": 0.0007,
+    "ml": 0.0033,
+    "mm": 0.0888,
+    "mr": 0.0038,
+    "bl": 0.0,
+    "bm": 0.0,
+    "br": 0.002,
+    "n_x": 0.3387,
+    "n_o": 0.0636,
+    "n_blank": 0.1546,
+    "threats_x": 0.1443,
+    "threats_o": 0.0952,
+    "blocked_x": 0.0703,
+    "blocked_o": 0.0328
+  }
+}

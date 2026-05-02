@@ -133,10 +133,38 @@ class MLPClassifier_(BaseClassifier):
         feats = _extract_features(board)
         return int(self._model.predict([feats])[0])
 
+class RandomForestClassifier_(BaseClassifier):
+    name        = "Random Forest"
+    description = "Ensemble de dezenas de árvores. Excelente combate ao overfitting."
+    model_file  = os.path.join(OUTPUT_DIR, "random_forest_model.pkl")
+
+    def __init__(self):
+        self._model = None
+
+    def _load(self):
+        if self._model is None:
+            with open(self.model_file, 'rb') as f:
+                self._model = pickle.load(f)
+
+    def is_available(self):
+        return os.path.exists(self.model_file)
+
+    def predict(self, board: list) -> int:
+        self._load()
+        import pandas as pd
+        import warnings
+        feat_names = ["tl","tm","tr","ml","mm","mr","bl","bm","br",
+                      "n_x","n_o","n_blank","threats_x","threats_o","blocked_x","blocked_o"]
+        df = pd.DataFrame([_extract_features(board)], columns=feat_names)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            return int(self._model.predict(df)[0])
+
 
 # ── Dicionário central — adicione/remova instâncias aqui ─────────────────────
 MODEL_REGISTRY: dict[str, BaseClassifier] = {
     "decision_tree": DecisionTreeClassifier_(),
+    "random_forest": RandomForestClassifier_(),
     "knn":           KNNClassifier_(),
     "mlp":           MLPClassifier_(),
 }
