@@ -4,8 +4,8 @@
     "n_estimators": 50,
     "max_depth": 15
   },
-  "acuracia_teste": 0.9825,
-  "precision_weighted": 0.9851,
-  "recall_weighted": 0.9825,
-  "f1_weighted": 0.983
+  "acuracia_teste": 0.9888,
+  "precision_weighted": 0.99,
+  "recall_weighted": 0.9888,
+  "f1_weighted": 0.9891
 }
