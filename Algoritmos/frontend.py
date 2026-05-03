@@ -72,8 +72,7 @@ class BaseClassifier:
 
 class DecisionTreeClassifier_(BaseClassifier):
     name        = "Árvore de Decisão"
-    # Descrição atualizada para refletir a correção do SMOTE
-    description = "Otimizado: balanceamento nativo (class_weight='balanced') sem distorção do SMOTE." 
+    description = "Modelo supervisionado e interpretável. Treinado com features do tabuleiro e balanceamento nativo de classes."
     model_file  = os.path.join(OUTPUT_DIR, "decision_tree_model.pkl")
 
     def __init__(self):
@@ -162,7 +161,7 @@ class HierarchicalClassifier(BaseClassifier):
 
 class RandomForestClassifier_(BaseClassifier):
     name        = "Random Forest"
-    description = "Ensemble de dezenas de árvores. Excelente combate ao overfitting."
+    description = "Ensemble supervisionado de várias árvores. Geralmente mais robusto e com melhor generalização que uma única árvore."
     model_file  = os.path.join(OUTPUT_DIR, "random_forest_model.pkl")
 
     def __init__(self):
@@ -380,6 +379,29 @@ main {
 }
 
 /* ── Board ── */
+.board-row {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  column-gap: 24px;
+  align-items: start;
+  width: 100%;
+  align-self: stretch;
+}
+
+.difficulty-col {
+  width: 240px;
+  max-width: 240px;
+  margin-left: clamp(-160px, -8vw, -80px);
+}
+
+.board-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+}
+
 .board {
   display: grid;
   grid-template-columns: repeat(3, var(--cell-size));
@@ -433,7 +455,7 @@ main {
 @keyframes winfade { from { opacity: 0; } to { opacity: 1; } }
 
 /* ── Controls ── */
-.controls { display: flex; gap: 12px; }
+.controls { display: flex; gap: 12px; justify-content: center; }
 
 .btn {
   font-family: 'Space Mono', monospace;
@@ -609,6 +631,8 @@ option[disabled] { color: var(--muted); font-style: italic; }
 @media (max-width: 700px) {
   main { grid-template-columns: 1fr; padding: 16px; }
   .game-col { padding-right: 0; }
+  .board-row { grid-template-columns: 1fr; row-gap: 16px; justify-items: center; }
+  .difficulty-col { width: 100%; max-width: 360px; margin-left: 0; }
   .side-col { border-left: none; border-top: 1px solid var(--border);
               padding-left: 0; padding-top: 28px; margin-top: 8px; }
   :root { --cell-size: 90px; }
@@ -626,26 +650,53 @@ option[disabled] { color: var(--muted); font-style: italic; }
   <!-- ── Coluna do jogo ── -->
   <div class="game-col">
 
-    <div class="turn-indicator">
-      <div class="turn-dot" id="turnDot"></div>
-      <span id="turnText">Aguardando...</span>
-    </div>
+    <div class="board-row">
 
-    <!-- Tabuleiro -->
-    <div class="board" id="board">
-      <!-- linhas SVG -->
-      <svg class="board-lines" viewBox="0 0 330 330" xmlns="http://www.w3.org/2000/svg">
-        <line x1="110" y1="10"  x2="110" y2="320" stroke="#1e2d4a" stroke-width="1.5"/>
-        <line x1="220" y1="10"  x2="220" y2="320" stroke="#1e2d4a" stroke-width="1.5"/>
-        <line x1="10"  y1="110" x2="320" y2="110" stroke="#1e2d4a" stroke-width="1.5"/>
-        <line x1="10"  y1="220" x2="320" y2="220" stroke="#1e2d4a" stroke-width="1.5"/>
-      </svg>
-      <!-- células injetadas via JS -->
-    </div>
+      <!-- Dificuldade (separado do painel lateral) -->
+      <div class="difficulty-col">
+        <div class="panel-section">
+          <div class="panel-label">Dificuldade (jogada do O)</div>
+          <select class="model-select" id="difficultySelect" onchange="onDifficultyChange()">
+            <option value="default" selected>Padrão (aleatório)</option>
+            <option disabled>────────</option>
+            <option value="easy">Fácil</option>
+            <option value="medium">Médio</option>
+            <option value="hard">Difícil</option>
+            <option value="impossible">Impossível</option>
+          </select>
+          <div class="model-desc" id="difficultyDesc">
+            <span class="d-desc" data-key="default" style="display:block">O joga aleatoriamente</span>
+            <span class="d-desc" data-key="easy" style="display:none">O faz jogadas fracas e evita lances óbvios</span>
+            <span class="d-desc" data-key="medium" style="display:none">O tenta vencer quando possível, caso contrário, joga aleatório</span>
+            <span class="d-desc" data-key="hard" style="display:none">O tenta vencer, bloquear ameaças e prefere centro/cantos</span>
+            <span class="d-desc" data-key="impossible" style="display:none">O joga de forma ótima (minimax). Não perde.</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="controls">
-      <button class="btn btn-primary" onclick="newGame()">↺ Nova Partida</button>
-      <button class="btn btn-ghost"   onclick="resetScore()">Zerar Score</button>
+      <div class="board-area">
+        <div class="turn-indicator">
+          <div class="turn-dot" id="turnDot"></div>
+          <span id="turnText">Aguardando...</span>
+        </div>
+
+        <!-- Tabuleiro -->
+        <div class="board" id="board">
+          <!-- linhas SVG -->
+          <svg class="board-lines" viewBox="0 0 330 330" xmlns="http://www.w3.org/2000/svg">
+            <line x1="110" y1="10"  x2="110" y2="320" stroke="#1e2d4a" stroke-width="1.5"/>
+            <line x1="220" y1="10"  x2="220" y2="320" stroke="#1e2d4a" stroke-width="1.5"/>
+            <line x1="10"  y1="110" x2="320" y2="110" stroke="#1e2d4a" stroke-width="1.5"/>
+            <line x1="10"  y1="220" x2="320" y2="220" stroke="#1e2d4a" stroke-width="1.5"/>
+          </svg>
+          <!-- células injetadas via JS -->
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-primary" onclick="newGame()">↺ Nova Partida</button>
+          <button class="btn btn-ghost"   onclick="resetScore()">Zerar Score</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -739,6 +790,7 @@ let humanTurn   = true;   // humano é X, computador é O
 let totalHits   = 0;
 let totalErrors = 0;
 let currentModel = document.getElementById('modelSelect').value;
+let currentDifficulty = document.getElementById('difficultySelect')?.value || 'default';
 
 // ─── Inicialização ───────────────────────────────────────────────────────────
 function buildBoard() {
@@ -791,12 +843,138 @@ async function computerMove() {
   if (!gameActive) return;
   const empty = board.map((v,i) => v==='b' ? i : -1).filter(i => i>=0);
   if (!empty.length) return;
-  const idx = empty[Math.floor(Math.random() * empty.length)];
+
+  const idx = chooseComputerMove(board, currentDifficulty);
   applyMove(idx, 'o');
   humanTurn = true;
   await classify();
   if (!gameActive) return;
   setTurn('x');
+}
+
+// ─── Dificuldade: escolha de jogada do computador (O) ───────────────────────
+function chooseComputerMove(b, difficulty) {
+  const empty = b.map((v,i) => v==='b' ? i : -1).filter(i => i>=0);
+  if (!empty.length) return -1;
+
+  // Padrão (comportamento atual): aleatório
+  if (difficulty === 'default') {
+    return empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  const oWins = winningMoves(b, 'o');
+  const xWins = winningMoves(b, 'x');
+
+  if (difficulty === 'easy') {
+    // Evita ganhar e evita bloquear (se houver alternativas), para ficar bem fraco.
+    const avoid = new Set([...oWins, ...xWins]);
+    const candidates = empty.filter(i => !avoid.has(i));
+    const pool = candidates.length ? candidates : empty;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  if (difficulty === 'medium') {
+    // Se pode vencer, vence; senão aleatório.
+    if (oWins.length) return oWins[Math.floor(Math.random() * oWins.length)];
+    return empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  if (difficulty === 'hard') {
+    // Vence se possível; senão bloqueia ameaça imediata; senão heurística simples.
+    if (oWins.length) return oWins[Math.floor(Math.random() * oWins.length)];
+    if (xWins.length) return xWins[Math.floor(Math.random() * xWins.length)];
+
+    if (b[4] === 'b') return 4; // centro
+    const corners = [0,2,6,8].filter(i => b[i] === 'b');
+    if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
+    return empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  // Impossível: minimax ótimo
+  if (difficulty === 'impossible') {
+    return minimaxBestMove(b, 'o');
+  }
+
+  // Fallback
+  return empty[Math.floor(Math.random() * empty.length)];
+}
+
+function winningMoves(b, sym) {
+  const empty = b.map((v,i) => v==='b' ? i : -1).filter(i => i>=0);
+  const wins = [];
+  for (const idx of empty) {
+    const bb = b.slice();
+    bb[idx] = sym;
+    if (winnerSymbol(bb) === sym) wins.push(idx);
+  }
+  return wins;
+}
+
+function winnerSymbol(b) {
+  for (const [a,c,d] of LINES) {
+    if (b[a] !== 'b' && b[a] === b[c] && b[a] === b[d]) return b[a];
+  }
+  return null;
+}
+
+function terminalState(b) {
+  const w = winnerSymbol(b);
+  if (w) return w;
+  if (!b.includes('b')) return 'draw';
+  return null;
+}
+
+function minimaxBestMove(b, sym) {
+  const memo = new Map();
+  let bestScore = -Infinity;
+  let bestMove = -1;
+  const empty = b.map((v,i) => v==='b' ? i : -1).filter(i => i>=0);
+  for (const idx of empty) {
+    const bb = b.slice();
+    bb[idx] = sym;
+    const score = minimax(bb, 'x', memo);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMove = idx;
+    }
+  }
+  return bestMove >= 0 ? bestMove : empty[0];
+}
+
+function minimax(b, player, memo) {
+  const term = terminalState(b);
+  // Score simples e exato (evita problemas de cache com poda):
+  //  1  = vitória do O
+  //  0  = empate
+  // -1  = vitória do X
+  if (term === 'o') return 1;
+  if (term === 'x') return -1;
+  if (term === 'draw') return 0;
+
+  const key = b.join('') + '|' + player;
+  if (memo.has(key)) return memo.get(key);
+
+  const empty = b.map((v,i) => v==='b' ? i : -1).filter(i => i>=0);
+
+  let value;
+  if (player === 'o') {
+    value = -Infinity;
+    for (const idx of empty) {
+      const bb = b.slice();
+      bb[idx] = 'o';
+      value = Math.max(value, minimax(bb, 'x', memo));
+    }
+  } else {
+    value = Infinity;
+    for (const idx of empty) {
+      const bb = b.slice();
+      bb[idx] = 'x';
+      value = Math.min(value, minimax(bb, 'o', memo));
+    }
+  }
+
+  memo.set(key, value);
+  return value;
 }
 
 // ─── Aplica jogada no board ──────────────────────────────────────────────────
@@ -945,6 +1123,14 @@ function onModelChange() {
   log(`Modelo alterado para: ${currentModel}`, 'sys');
 }
 
+function onDifficultyChange() {
+  currentDifficulty = document.getElementById('difficultySelect').value;
+  document.querySelectorAll('.d-desc').forEach(el => {
+    el.style.display = el.dataset.key === currentDifficulty ? 'block' : 'none';
+  });
+  log(`Dificuldade alterada para: ${currentDifficulty}`, 'sys');
+}
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 buildBoard();
 newGame();
@@ -963,6 +1149,7 @@ if __name__ == '__main__':
         status = "✓" if m.is_available() else "✗ (arquivo .pkl não encontrado)"
         print(f"  [{status}] {m.name}")
     print()
-    print("Acesse: http://localhost:5000")
+    port = int(os.environ.get("PORT", "5000"))
+    print(f"Acesse: http://localhost:{port}")
     print()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=port)
