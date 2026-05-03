@@ -16,8 +16,9 @@ def main() -> int:
     # Lista de Modelos do Projeto
     modelos = [
         {"script": "decision_tree.py", "pkl": "decision_tree_model.pkl"},
-        {"script": "random_forest.py", "pkl": "random_forest_model.pkl"}
-        # Exemplo futuro: {"script": "knn.py", "pkl": "knn_model.pkl"}
+        {"script": "random_forest.py", "pkl": "random_forest_model.pkl"},
+        {"script": "knn.py", "pkl": "knn_model.pkl"},
+        {"script": "hierarchical_clustering.py", "pkl": "hierarchical_model.pkl"}
     ]
 
     parser = argparse.ArgumentParser()

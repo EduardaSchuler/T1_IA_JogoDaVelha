@@ -17,7 +17,7 @@ from sklearn.metrics import (
 random.seed(42)
 np.random.seed(42)
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATASET_DIR = BASE_DIR / 'dataset'
 OUTPUT_DIR = BASE_DIR / 'outputs'
 DATASET_DIR.mkdir(parents=True, exist_ok=True)

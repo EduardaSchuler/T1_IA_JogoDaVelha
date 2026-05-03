@@ -1,6 +1,7 @@
 import warnings
 import pandas as pd
 import pickle, random, json, os
+import numpy as np
 from flask import Flask, render_template_string, request, jsonify
 
 """
@@ -9,7 +10,7 @@ Servidor Flask que expõe o jogo e a classificação de estado por modelos de ML
 """
 
 # ─── caminho dos artefatos ───────────────────────────────────────────────────
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -97,8 +98,8 @@ class DecisionTreeClassifier_(BaseClassifier):
 
 
 class KNNClassifier_(BaseClassifier):
-    name        = "k-NN"
-    description = "A ser implementado"
+    name        = "K-NN"
+    description = "Classificador por vizinhos mais próximos usando 16 features de tabuleiro."
     model_file  = os.path.join(OUTPUT_DIR, "knn_model.pkl")
 
     def __init__(self):
@@ -133,6 +134,30 @@ class MLPClassifier_(BaseClassifier):
         feats = _extract_features(board)
         return int(self._model.predict([feats])[0])
 
+
+class HierarchicalClassifier(BaseClassifier):
+    name        = "Agrupamento Hierárquico"
+    description = "Clusterização hierárquica adaptada para classificação usando centroides."
+    model_file  = os.path.join(OUTPUT_DIR, "hierarchical_model.pkl")
+
+    def __init__(self):
+        self._model = None
+
+    def is_available(self):
+        return os.path.exists(self.model_file)
+
+    def predict(self, board: list) -> int:
+        if self._model is None:
+            with open(self.model_file, 'rb') as f:
+                self._model = pickle.load(f)
+        feats = np.asarray(_extract_features(board), dtype=float)
+        centroids = np.asarray(self._model['centroids'], dtype=float)
+        distances = np.linalg.norm(centroids - feats, axis=1)
+        nearest = int(np.argmin(distances))
+        mapping = {int(k): int(v) for k, v in self._model['mapping'].items()}
+        return int(mapping[nearest])
+
+
 class RandomForestClassifier_(BaseClassifier):
     name        = "Random Forest"
     description = "Ensemble de dezenas de árvores. Excelente combate ao overfitting."
@@ -166,6 +191,7 @@ MODEL_REGISTRY: dict[str, BaseClassifier] = {
     "decision_tree": DecisionTreeClassifier_(),
     "random_forest": RandomForestClassifier_(),
     "knn":           KNNClassifier_(),
+    "hierarchical":  HierarchicalClassifier(),
     "mlp":           MLPClassifier_(),
 }
 
@@ -201,23 +227,6 @@ def index():
         for key, m in MODEL_REGISTRY.items()
     ]
 
-    # Placeholders fixos no frontend (sempre visíveis, mas desabilitados)
-    models_info.extend(
-        [
-            {
-                "key": "model4",
-                "name": "Modelo 4",
-                "description": "Placeholder — ainda não implementado.",
-                "available": False,
-            },
-            {
-                "key": "model5",
-                "name": "Modelo 5",
-                "description": "Placeholder — ainda não implementado.",
-                "available": False,
-            },
-        ]
-    )
     return render_template_string(HTML_TEMPLATE,
                                   models=models_info,
                                   class_names=CLASS_NAMES)
