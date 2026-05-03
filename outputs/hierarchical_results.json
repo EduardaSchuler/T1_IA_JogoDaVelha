@@ -1,10 +1,10 @@
 {
   "algoritmo": "Agrupamento Hier\u00e1rquico",
   "params": {
-    "linkage": "average"
+    "linkage": "ward"
   },
-  "acuracia_teste": 0.547,
-  "precision_weighted": 0.5046,
-  "recall_weighted": 0.547,
-  "f1_weighted": 0.516
+  "acuracia_teste": 0.5885,
+  "precision_weighted": 0.5879,
+  "recall_weighted": 0.5885,
+  "f1_weighted": 0.5859
 }

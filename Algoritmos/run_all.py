@@ -18,6 +18,7 @@ def main() -> int:
         {"script": "decision_tree.py", "pkl": "decision_tree_model.pkl"},
         {"script": "random_forest.py", "pkl": "random_forest_model.pkl"},
         {"script": "knn.py", "pkl": "knn_model.pkl"},
+        {"script": "multi_layer_perceptron.py", "pkl": "mlp_model.pkl"},
         {"script": "hierarchical_clustering.py", "pkl": "hierarchical_model.pkl"}
     ]
 

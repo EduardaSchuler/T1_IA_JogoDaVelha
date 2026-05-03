@@ -118,7 +118,7 @@ class KNNClassifier_(BaseClassifier):
 
 class MLPClassifier_(BaseClassifier):
     name        = "MLP"
-    description = "A ser implementado"
+    description = "Rede neural multicamadas treinada com backpropagation e solver Adam. Busca automática de topologia e hiperparâmetros via conjunto de validação."
     model_file  = os.path.join(OUTPUT_DIR, "mlp_model.pkl")
 
     def __init__(self):
@@ -131,8 +131,10 @@ class MLPClassifier_(BaseClassifier):
         if self._model is None:
             with open(self.model_file, 'rb') as f:
                 self._model = pickle.load(f)
-        feats = _extract_features(board)
-        return int(self._model.predict([feats])[0])
+        feats = np.array(_extract_features(board)).reshape(1, -1)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            return int(self._model.predict(feats)[0])
 
 
 class HierarchicalClassifier(BaseClassifier):
