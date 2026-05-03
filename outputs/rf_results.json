@@ -2,10 +2,10 @@
   "algoritmo": "Random Forest",
   "params": {
     "n_estimators": 50,
-    "max_depth": null
+    "max_depth": 15
   },
-  "acuracia_teste": 0.9841,
+  "acuracia_teste": 0.9825,
   "precision_weighted": 0.9851,
-  "recall_weighted": 0.9841,
-  "f1_weighted": 0.9841
+  "recall_weighted": 0.9825,
+  "f1_weighted": 0.983
 }
