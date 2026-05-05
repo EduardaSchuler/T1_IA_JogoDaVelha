@@ -10,7 +10,7 @@ def run(cmd: list[str], cwd: Path) -> None:
 
 def main() -> int:
     base_dir = Path(__file__).resolve().parent
-    output_dir = base_dir / "outputs"
+    output_dir = base_dir.parent / "outputs"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Lista de Modelos do Projeto

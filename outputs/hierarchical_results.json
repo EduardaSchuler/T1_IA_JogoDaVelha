@@ -3,8 +3,8 @@
   "params": {
     "linkage": "ward"
   },
-  "acuracia_teste": 0.5885,
-  "precision_weighted": 0.5879,
-  "recall_weighted": 0.5885,
-  "f1_weighted": 0.5859
+  "acuracia_teste": 0.5295,
+  "precision_weighted": 0.4219,
+  "recall_weighted": 0.5295,
+  "f1_weighted": 0.4665
 }
